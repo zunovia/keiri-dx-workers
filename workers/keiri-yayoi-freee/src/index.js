@@ -3068,6 +3068,14 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 </script>
 </body>
 </html>`;
+    // トップ以外は 404 にする。以前は任意のパスに LP を 200 で返しており、
+    // 脆弱性スキャナー（.php / wp-admin 探し）の標的になり、検索エンジンにも重複と見なされていた。
+    if (url.pathname !== "/" && url.pathname !== "/index.html") {
+      return new Response("Not Found", {
+        status: 404,
+        headers: { "Content-Type": "text/plain;charset=UTF-8", "Cache-Control": "no-store" },
+      });
+    }
     return new Response(html, {
       // Cache-Controlが無いとデプロイ後もエッジの古いHTMLが配信される
       headers: {
